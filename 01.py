@@ -25,9 +25,7 @@ fuel_b = 0
 with open(sys.argv[1], 'r') as f:
     for l in f:
         fuel_a += formula_a(int(l))
-        # print(fuel_a)
         fuel_b += formula_b(int(l))
-        # print(fuel_b)
 
 print(f'[01a] Total fuel cost is {fuel_a}.')
 print(f'[01b] Total fuel cost is {fuel_b}.')

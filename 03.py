@@ -15,19 +15,21 @@ DIRECTION_DELTAS = {
     'U': -1j,
     }
 
-def get_points(wire_def):
-    points = set()
-    point = 0
-    for s in wire_def.split(','):
+def get_units(wire):
+    units = {}
+    coord = 0
+    steps = 0
+    for s in wire.split(','):
         delta = DIRECTION_DELTAS[s[0]]
         length = int(s[1:])
         for i in range(length):
-            point += delta
-            points.add(point)
-    return points
+            coord += delta
+            steps += 1
+            units[coord] = steps
+    return units
 
-def distance_to_origin(point):
-    return int(abs(point.real) + abs(point.imag))
+def distance_to_origin(coord):
+    return int(abs(coord.real) + abs(coord.imag))
 
 with open(sys.argv[1], 'r') as f:
     wires = [l.strip() for l in f]
@@ -35,14 +37,21 @@ pairs = [wires[i:i+2] for i in range(0, len(wires), 2)]
 
 for p in pairs:
     print('\n'.join(p))
-    points_0 = get_points(p[0])
-    points_1 = get_points(p[1])
-    intersections = points_0.intersection(points_1)
+    units_0 = get_units(p[0])
+    units_1 = get_units(p[1])
+    intersections = set(units_0.keys()).intersection(set(units_1.keys()))
     closest = 0
-    for i in intersections:
-        distance = distance_to_origin(i)
+    fastest = 0
+    for c in intersections:
+        distance = distance_to_origin(c)
         if closest == 0 or distance < min_distance:
-            closest = i
+            closest = c
             min_distance =  distance
+        steps = units_0[c] + units_1[c]
+        if fastest == 0 or steps < min_steps:
+            fastest = c
+            min_steps = steps
     print(f'[03a] The intersection closest to the origin is at {closest} with'
           f' a distance of {min_distance}.')
+    print(f'[03b] The intersection fastest from the origin is at {fastest}'
+          f' with {min_steps} steps.')
